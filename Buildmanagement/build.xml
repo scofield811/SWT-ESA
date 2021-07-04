@@ -1,0 +1,129 @@
+<project basedir="." name="ESA9" default ="GESAMT"> 
+	<description>Buildfile für die ESA 9</description>
+	
+	<!-- Variablendefinition -->
+	<property name="doc" location="doc"/>
+	<property name="build" location="build"/>
+	<property name="src" location="src"/>
+	<property name="dist" location="dist"/>
+	<property name="test" location="test"/>
+	
+	
+	<path id="tests.classpath">
+		<!-- Abhängigkeiten für JUNIT 5-->
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.jupiter.api_5.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.jupiter.engine_5.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.jupiter.migrationsupport_5.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.jupiter.params_5.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.platform.commons_1.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.platform.engine_1.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.platform.launcher_1.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.platform.runner_1.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.platform.suite.api_1.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit.vintage.engine_5.7.1.v20210222-1948.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.opentest4j_1.2.0.v20190826-0900.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.apiguardian_1.1.0.v20190826-0900.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.junit_4.13.0.v20200204-1500.jar" />
+		<pathelement location="/Users/manuelstahl/.p2/pool/plugins/org.hamcrest.core_1.3.0.v20180420-1519.jar" />
+		
+		<!-- weitere Abhängigkeiten für das Kompilieren der Testfälle-->
+		<pathelement location="${dist}/HelloWorld.jar"/>
+		<pathelement location="${test}" />
+		
+	</path>
+
+
+	<target name="GESAMT" depends="TEST,DOC">
+		<!-- GesamtTask -->
+		<echo message="Ausgeführt"/>
+	</target>
+	
+	
+	<target name="TEST" depends="GET,RUN">
+		<echo message="Starte Tests"/>
+			
+		<!-- Definition für JUNIT 5 Tests -->
+		<junitlauncher >
+		    <classpath refid="tests.classpath"/>
+			
+			<!-- haltonfailure bedeutet dass das ANT-Script abgebrochen wird sobald die Tests nicht erfolgreich sind -->
+		    <testclasses haltonfailure="true">
+		        <fileset dir="${test}">
+		        	<!-- Führe alle Testsklassen aus die *Test.class heißen -->
+		            <include name="**/*Test.class"/>
+		        </fileset>
+		    </testclasses>
+		</junitlauncher>
+		
+		</target>
+	
+	
+	<target name="RUN" depends="COMPILE">
+		<!-- Führe Projekt aus mit Angabe der Startklasse -->
+		<echo message="Führe Projekt aus"/>
+	    <java dir="${build}" classname="ESA9.Helloworld" fork="yes">
+	        <arg line="${args}"/>
+	    </java>
+	</target>
+	
+	
+	<target name="COMPILE">
+		<echo message="Kompiliere Projekt und erstelle Runnable Jar"/>
+		<mkdir dir="${build}"/>
+		
+		<!-- Kompilieren des Projektes  -->
+		<javac srcdir="${src}" destdir="${build}" includeantruntime="false"/>
+		<jar destfile="${dist}/HelloWorld.jar" basedir="${build}">
+			<!-- Definition der Manifestdatei mit Angabe der Main-Class -->
+			<manifest>
+				<attribute name="Main-Class" value="ESA9.Helloworld"/>
+		        <attribute name="Class-Path" value="."/>
+		    </manifest>
+		</jar>
+		
+		<!-- Kompilieren der Testklassen mit Angabe der notwendigen Abhängikeiten -->
+		<javac srcdir="${test}" destdir="${test}" includeantruntime="false" classpathref="tests.classpath"/>
+	</target>
+	
+	
+	<target name="CLEAN">
+		<!-- Lösche Verzeichnisse -->
+		<echo message="Bereinige Projekt"/>
+		<delete dir="${doc}"/>
+		<delete dir="$build}"/>
+		<delete dir="${src}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${test}"/>
+	</target>
+	
+	
+	<target name="GET" depends="CLEAN">
+		<!-- Hohle/kopiere Projekt und Testklassen -->
+		<echo message="Hole Projekt"/>
+		<mkdir dir="${src}"/>
+		<mkdir dir="${test}"/>
+		<copy file="Helloworld.java" todir="${src}"/>
+		<copy file="HelloWorldTest.java" todir="${test}"/>
+	</target>
+	
+	
+	<!-- <target name="JAR">
+		<echo message="Erstelle JAR"/>
+		<jar destfile="${dist}/HelloWorld.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="ESA9.Helloworld"/>
+            	<attribute name="Class-Path" value="."/>
+        	</manifest>
+		</jar>
+	</target> -->
+	
+	
+	<target name="DOC">
+		<!-- Erstelle die JAVA Dokumentation -->
+		<echo message="Erstelle JAVA-DOC"/>
+		<mkdir dir="${doc}"/>
+	    <javadoc destdir="${doc}">
+	        <fileset dir="${src}" />
+	    </javadoc>
+	</target>
+</project>
