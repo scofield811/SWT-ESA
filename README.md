@@ -22,3 +22,9 @@ Aufgabe 4)
 - Telefonliste.java
 - TelefonlisteTest.java
 - TelefonListeDatabase.java
+
+
+## --- Buildmanagement ---:
+- build.xml -> ANT-Script inkl. Kommentare im Script
+- Helloworld.java -> Beispielklasse
+- HelloWorldTest.java -> JUNIT-Testklasse
